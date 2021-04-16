@@ -1,4 +1,5 @@
 ﻿using System;
+using csharp_sdl;
 using SDL2;
 
 namespace ConsoleApp3
@@ -37,31 +38,32 @@ namespace ConsoleApp3
 
             //SDL.SDL_Delay(5000);
 
+            PhysicEngine engine = new PhysicEngine();
+
             SDL.SDL_Rect rect;
             rect.h = 50;
             rect.w = 50;
             rect.x = 500;
             rect.y = 300;
 
-            float ax = 0.0f;
-            float ay = 0.0f;
-
-            float vx = 0.0f;
-            float vy = 0.0f;
-
-            float x = 500.0f;
-            float y = 300.0f;
+            Coordinate x = new Coordinate(500.0f, 300.0f);
+            Coordinate v = new Coordinate(0.2f, 0.0f);
+            Coordinate a = new Coordinate(0.0f, 0.0f);
+            Coordinate[] tens = new Coordinate[] { x, v, a };
 
             float dt = 0.01f;
-            float f = 0.1f;
+            float f = 10.0f;
             double ticks;
 
             SDL.SDL_Event e;
             bool quit = false;
             while (!quit)
             {
+                tens[2].x = 0.0f;
+                tens[2].y = 0.0f;
+
                 // events
-                while (SDL.SDL_PollEvent(out e) != 0)
+                if (SDL.SDL_PollEvent(out e) != 0)
                 {
                     Console.WriteLine(e.type);
 
@@ -77,16 +79,16 @@ namespace ConsoleApp3
                                     quit = true;
                                     break;
                                 case SDL.SDL_Keycode.SDLK_w:
-                                    ay = -f;
+                                    tens[2].y = -f;
                                     break;
                                 case SDL.SDL_Keycode.SDLK_a:
-                                    ax = -f;
+                                    tens[2].x = -f;
                                     break;
                                 case SDL.SDL_Keycode.SDLK_s:
-                                    ay = f;
+                                    tens[2].y = f;
                                     break;
                                 case SDL.SDL_Keycode.SDLK_d:
-                                    ax = f;
+                                    tens[2].x = f;
                                     break;
                             }
                             break;
@@ -96,20 +98,18 @@ namespace ConsoleApp3
                 // update
                 ticks = SDL.SDL_GetTicks();
                 Console.WriteLine(ticks);
-                vx = vx + ax * dt;
-                vy = vy + ay * dt;
-                x = x + vx * dt;
-                y = y + vy * dt;
 
-                rect.x = (int)x;
-                rect.y = (int)y;
+                tens = engine.Step(tens, dt);
+
+                rect.x = (int)tens[0].x;
+                rect.y = (int)tens[0].y;
 
                 // borders
-                if (rect.x >= 1020 || rect.x <= 0) vx = -vx;
-                if (rect.y >= 800 || rect.y <= 0) vy = -vy;
+                if (tens[0].x >= 1020 || tens[0].x <= 0) tens[1].x = -tens[1].x;
+                if (tens[0].y >= 800 || tens[0].y <= 0) tens[1].y = -tens[1].y;
 
                 // render
-                SDL.SDL_SetRenderDrawColor(renderer, 255, 120, 0, 255); // orange
+                SDL.SDL_SetRenderDrawColor(renderer, 255, 200, 0, 255); // orange
                 SDL.SDL_RenderClear(renderer);
 
                 SDL.SDL_SetRenderDrawColor(renderer, 0, 150, 255, 255);   // azzurro
