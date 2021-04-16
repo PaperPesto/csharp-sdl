@@ -47,12 +47,12 @@ namespace ConsoleApp3
             rect.y = 300;
 
             Coordinate x = new Coordinate(500.0f, 300.0f);
-            Coordinate v = new Coordinate(0.2f, 0.0f);
+            Coordinate v = new Coordinate(0.0f, 0.0f);
             Coordinate a = new Coordinate(0.0f, 0.0f);
             Coordinate[] tens = new Coordinate[] { x, v, a };
 
             float dt = 0.01f;
-            float f = 10.0f;
+            float f = 20.0f;
             double ticks;
 
             SDL.SDL_Event e;
@@ -62,7 +62,7 @@ namespace ConsoleApp3
                 tens[2].x = 0.0f;
                 tens[2].y = 0.0f;
 
-                // events
+                // events --------------------------------------------------------
                 if (SDL.SDL_PollEvent(out e) != 0)
                 {
                     Console.WriteLine(e.type);
@@ -95,7 +95,7 @@ namespace ConsoleApp3
                     }
                 }
 
-                // update
+                // update --------------------------------------------------------
                 ticks = SDL.SDL_GetTicks();
                 Console.WriteLine(ticks);
 
@@ -104,16 +104,26 @@ namespace ConsoleApp3
                 rect.x = (int)tens[0].x;
                 rect.y = (int)tens[0].y;
 
+                int line_vx1 = rect.x;
+                int line_vy1 = rect.y;
+                int line_vx2 = line_vx1 + (int)tens[1].x;
+                int line_vy2 = line_vy1 + (int)tens[1].y;
+
                 // borders
                 if (tens[0].x >= 1020 || tens[0].x <= 0) tens[1].x = -tens[1].x;
                 if (tens[0].y >= 800 || tens[0].y <= 0) tens[1].y = -tens[1].y;
 
-                // render
+
+                // render --------------------------------------------------------
                 SDL.SDL_SetRenderDrawColor(renderer, 255, 200, 0, 255); // orange
                 SDL.SDL_RenderClear(renderer);
 
                 SDL.SDL_SetRenderDrawColor(renderer, 0, 150, 255, 255);   // azzurro
                 SDL.SDL_RenderFillRect(renderer, ref rect);
+
+                SDL.SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);   // rosso
+                SDL.SDL_RenderDrawLine(renderer, line_vx1, line_vy1, line_vx2, line_vy2);
+
                 SDL.SDL_RenderPresent(renderer);
 
                 //SDL.SDL_Delay(50);
